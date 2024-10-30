@@ -9,7 +9,7 @@ import { toast } from '@/hooks/use-toast'
 
 const ITALIAN_PHONETIC_ALPHABET = {
   'A': 'Ancona', 'B': 'Bologna', 'C': 'Como', 'D': 'Domodossola', 'E': 'Empoli',
-  'F': 'Firenze', 'G': 'Genova', 'H': 'Hotel', 'I': 'Imola', 'J': 'I lunga',
+  'F': 'Firenze', 'G': 'Genova', 'H': 'Hotel', 'I': 'Imola', 'J': 'i-lunga',
   'K': 'Kappa', 'L': 'Livorno', 'M': 'Milano', 'N': 'Napoli', 'O': 'Orvieto',
   'P': 'Pisa', 'Q': 'Quadro', 'R': 'Roma', 'S': 'Siena', 'T': 'Torino',
   'U': 'Udine', 'V': 'Venezia', 'W': 'Doppia Vu', 'X': 'Ics', 'Y': 'Ipsilon', 'Z': 'Zeta'
