@@ -4,10 +4,12 @@ import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { Copy, Check } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
 
 const ITALIAN_PHONETIC_ALPHABET = {
   'A': 'Ancona', 'B': 'Bologna', 'C': 'Como', 'D': 'Domodossola', 'E': 'Empoli',
-  'F': 'Firenze', 'G': 'Genova', 'H': 'Hotel', 'I': 'Imola', 'J': 'i-lunga',
+  'F': 'Firenze', 'G': 'Genova', 'H': 'Hotel', 'I': 'Imola', 'J': 'I lunga',
   'K': 'Kappa', 'L': 'Livorno', 'M': 'Milano', 'N': 'Napoli', 'O': 'Orvieto',
   'P': 'Pisa', 'Q': 'Quadro', 'R': 'Roma', 'S': 'Siena', 'T': 'Torino',
   'U': 'Udine', 'V': 'Venezia', 'W': 'Doppia Vu', 'X': 'Ics', 'Y': 'Ipsilon', 'Z': 'Zeta'
@@ -22,6 +24,8 @@ const translations = {
     originalText: 'Original Text:',
     phoneticVersion: 'Phonetic Version:',
     clearText: 'Clear Text',
+    copyToClipboard: 'Copy to Clipboard',
+    copied: 'Copied!',
     emptyState: 'Enter text above to see the phonetic conversion'
   },
   it: {
@@ -32,6 +36,8 @@ const translations = {
     originalText: 'Testo Originale:',
     phoneticVersion: 'Versione Fonetica:',
     clearText: 'Cancella Testo',
+    copyToClipboard: 'Copia negli Appunti',
+    copied: 'Copiato!',
     emptyState: 'Inserisci il testo sopra per vedere la conversione fonetica'
   }
 }
@@ -39,15 +45,21 @@ const translations = {
 export function PhoneticConverter() {
   const [inputText, setInputText] = useState('')
   const [language, setLanguage] = useState<'en' | 'it'>('en')
+  const [isCopied, setIsCopied] = useState(false)
 
   const t = translations[language]
 
   const textToPhonetic = (text: string) => {
     return text
-      .toUpperCase()
-      .split('')
-      .map(char => char.match(/[A-Z]/) ? ITALIAN_PHONETIC_ALPHABET[char] : char)
-      .join(' ')
+      .split(' ')
+      .map(word => 
+        word
+          .toUpperCase()
+          .split('')
+          .map(char => char.match(/[A-Z]/) ? ITALIAN_PHONETIC_ALPHABET[char] : char)
+          .join(' ')
+      )
+      .join('   ')  // Three spaces between words for better visibility
   }
 
   const getColorForLetter = (letter: string) => {
@@ -73,6 +85,18 @@ export function PhoneticConverter() {
           {rest}
         </span>
       )
+    })
+  }
+
+  const copyToClipboard = () => {
+    const phoneticText = textToPhonetic(inputText)
+    navigator.clipboard.writeText(phoneticText).then(() => {
+      setIsCopied(true)
+      toast({
+        title: t.copied,
+        duration: 2000,
+      })
+      setTimeout(() => setIsCopied(false), 2000)
     })
   }
 
@@ -106,7 +130,13 @@ export function PhoneticConverter() {
           />
         </div>
 
-        <div className="rounded-lg bg-muted p-6 h-[300px] overflow-auto">
+        <div 
+          className="rounded-lg bg-muted p-6 h-[300px] overflow-auto relative" 
+          onClick={copyToClipboard}
+          role="button"
+          tabIndex={0}
+          aria-label={t.copyToClipboard}
+        >
           {inputText ? (
             <>
               <div className="text-lg font-medium mb-3">{t.originalText}</div>
@@ -130,14 +160,25 @@ export function PhoneticConverter() {
           )}
         </div>
 
-        <Button 
-          onClick={() => setInputText('')}
-          variant="outline"
-          className="w-full text-lg py-6"
-          disabled={!inputText}
-        >
-          {t.clearText}
-        </Button>
+        <div className="flex justify-between">
+          <Button 
+            onClick={() => setInputText('')}
+            variant="outline"
+            className="text-lg py-6 px-8"
+            disabled={!inputText}
+          >
+            {t.clearText}
+          </Button>
+          <Button
+            onClick={copyToClipboard}
+            variant="outline"
+            className="text-lg py-6 px-8"
+            disabled={!inputText}
+          >
+            {isCopied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+            {t.copyToClipboard}
+          </Button>
+        </div>
       </div>
     </Card>
   )
